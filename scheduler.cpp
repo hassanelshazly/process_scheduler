@@ -47,7 +47,7 @@ QList<Job> Scheduler::schedule_preemptive(std::function<bool (Job &, Job &)> com
 
     while(wait_it != wait_queue.end() ||
           ready_queue.size()) {
-        std::cout << current_time << std::endl;
+
         if(output_list.size()) {
             last_job = output_list.back();
             if(last_job.end_time() > current_time) {
@@ -76,7 +76,7 @@ QList<Job> Scheduler::schedule_preemptive(std::function<bool (Job &, Job &)> com
             wait_it++;
         }
 
-        if(output_list.size() &&
+        if (output_list.size() &&
                 current_job.id() == output_list.back().id()) {
             output_list.back().setDuration(
                         output_list.back().duration() + current_job.duration());
@@ -157,6 +157,7 @@ double Scheduler::average_waiting_time(const QList<Job> &jobs)
         last_end_time = jobs[0].end_time();
         for(int i = 1; i < jobs.size(); i++) {
            waiting_time += jobs[i].start_time() - last_end_time;
+           last_end_time = jobs[i].end_time();
         }
     }
     return waiting_time / (double) jobs_map.size();
