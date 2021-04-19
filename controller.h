@@ -12,6 +12,7 @@ public:
     JobController(QObject *parent = 0);
 
     JobModel *model();
+
 public slots:
     void addSlot();
 private:

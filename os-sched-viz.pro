@@ -1,6 +1,6 @@
 QT += core quick
 
-CONFIG += c++11
+CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -8,12 +8,14 @@ CONFIG += c++11
 
 HEADERS += \
     controller.h \
-    model.h
+    model.h \
+    scheduler.h
 
 SOURCES += \
         controller.cpp \
         main.cpp \
-        model.cpp
+        model.cpp \
+        scheduler.cpp
 
 RESOURCES += qml.qrc
 
