@@ -41,6 +41,11 @@ Item {
                 title: "Duration"
                 width: 96
             }
+            TableViewColumn {
+                role: "priority"
+                title: "Priority"
+                width: 96
+            }
 
             model: root.jobModel
         }

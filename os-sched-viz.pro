@@ -1,6 +1,6 @@
 QT += core quick charts
 
-CONFIG += c++11
+CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -8,12 +8,14 @@ CONFIG += c++11
 
 HEADERS += \
     model/job.h \
-    model/timeline.h
+    model/timeline.h \
+    scheduler.h
 
 SOURCES += \
         main.cpp \
         model/job.cpp \
-        model/timeline.cpp
+        model/timeline.cpp \
+        scheduler.cpp
 
 RESOURCES += qml.qrc
 
