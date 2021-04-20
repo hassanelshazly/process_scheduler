@@ -1,9 +1,10 @@
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQuickView>
 #include <QQuickItem>
+#include <QDebug>
 
-#include "model.h"
-#include "controller.h"
+#include "model/job.h"
+#include "model/timeline.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,19 +12,20 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-    JobController job_controller;
+    TimelineModel timelineModel;
+    JobModel jobModel;
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);
-    view.setInitialProperties({{"model", QVariant::fromValue(job_controller.model())}});
+    view.setInitialProperties({{"timelineModel", QVariant::fromValue(&timelineModel)},
+                               {"jobModel", QVariant::fromValue(&jobModel)}});
     view.setSource(QUrl(QStringLiteral("qrc:main.qml")));
 
-    QObject *item = view.rootObject();
-    QObject::connect(item, SIGNAL(addSignal()),
-                     &job_controller, SLOT(addSlot()));
-
+    //    QObject *item = view.rootObject();
+    //    QObject::connect(item, SIGNAL(addSignal()),
+    //                     &job_controller, SLOT(addSlot()));
 
     view.show();
     return app.exec();

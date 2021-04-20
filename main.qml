@@ -1,96 +1,117 @@
-import QtQuick 2.12
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 1.4
+import QtQuick.Controls 2.15
+import QtCharts 2.3
 
-Rectangle {
+Item {
     id: root
+    width: 800
+    height: 600
 
-    width: 480
-    height: 240
+    property var jobModel
+    property var timelineModel
 
-    property var model
-    signal addSignal()
-    signal removeSignal(start_time: int)
-
-    gradient: Gradient {
-        GradientStop { position: 0.0; color: "#dbddde" }
-        GradientStop { position: 1.0; color: "#5fc9f8" }
-    }
-
-    Rectangle {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: 20
-
-        height: 48
-
-        color: "#53d769"
-        border.color: Qt.lighter(color, 1.1)
-
-        Text {
-            anchors.centerIn: parent
-
-            text: "Add job!"
-        }
-
-        MouseArea {
-            anchors.fill: parent
-
-            onClicked: {
-                root.addSignal()
-            }
-        }
-    }
-
-    ListView {
+    GridLayout {
         anchors.fill: parent
-        anchors.margins: 16
-        anchors.bottomMargin: 64
 
-        clip: true
+        rows: 2
+        columns: 2
 
-        orientation: ListView.Horizontal
+        TableView {
+            Layout.row: 0
+            Layout.column: 0
+            Layout.rowSpan: 2
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.margins: 8
 
-        spacing: 8
-
-        model: root.model
-
-        delegate: jobDelegate
-    }
-
-    Component {
-        id: jobDelegate
-
-        Rectangle {
-            id: wrapper
-
-            width: duration * 5
-            height: 32
-
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: "#f8306a" }
-                GradientStop { position: 1.0; color: "#fb5b40" }
+            TableViewColumn {
+                role: "label"
+                title: "Job"
+                width: 64
+            }
+            TableViewColumn {
+                role: "startTime"
+                title: "Start Time"
+                width: 96
+            }
+            TableViewColumn {
+                role: "duration"
+                title: "Duration"
+                width: 96
             }
 
-            Text {
-                anchors.centerIn: parent
+            model: root.jobModel
+        }
 
-                font.pixelSize: 10
+        Flickable {
+            id: charFlickabe
+            width: root.width * 3/4
+            height: root.height / 2
 
-                text: label
+            Layout.row: 1
+            Layout.column: 1
+            Layout.fillWidth: true
+            Layout.margins: 8
+
+            clip: true
+
+            contentWidth: timelineChart.width
+            contentHeight: timelineChart.height
+
+            ChartView {
+                id: timelineChart
+
+                width: 1080
+                height: parent.height
+
+                antialiasing: true
+                animationOptions: ChartView.AllAnimations
+                theme: ChartView.ChartThemeBrownSand
+                legend.alignment: Qt.AlignBottom
+
+                ValueAxis {
+                    id: timeAxis
+                    tickType: ValueAxis.TicksDynamic
+                    tickInterval: 5
+                }
+
+                HorizontalStackedBarSeries {
+                    id: ganttSeries
+
+                    axisX: timeAxis
+                    axisY: BarCategoryAxis { categories: ["Timeline"] }
+
+                    labelsVisible: true
+                    labelsPosition: AbstractBarSeries.LabelsCenter
+
+                    HBarModelMapper {
+                        model: root.timelineModel
+                        firstBarSetRow: 0
+                        lastBarSetRow: 11
+                        firstColumn: 0
+                        columnCount: 1
+
+                        Component.onCompleted: {
+                            const labels = root.timelineModel.labels()
+                            let colorMap = {}
+                            for (let i = 0; i < ganttSeries.count; i++) {
+                                if (colorMap[labels[i]] === undefined) {
+                                    colorMap[labels[i]] = ganttSeries.at(i).color
+                                } else {
+                                    ganttSeries.at(i).color = colorMap[labels[i]];
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            MouseArea {
-                anchors.fill: parent
-            }
-
-            ListView.onRemove: SequentialAnimation {
-                PropertyAction { target: wrapper; property: "ListView.delayRemove"; value: true }
-                NumberAnimation { target: wrapper; property: "scale"; to: 0; duration: 250; easing.type: Easing.InOutQuad }
-                PropertyAction { target: wrapper; property: "ListView.delayRemove"; value: false }
-            }
-
-            ListView.onAdd: SequentialAnimation {
-                NumberAnimation { target: wrapper; property: "scale"; from: 0; to: 1; duration: 250; easing.type: Easing.InOutQuad }
+            ScrollBar.horizontal: ScrollBar {
+                hoverEnabled: true
+                active: hovered || pressed
+                orientation: Qt.Horizontal
             }
         }
     }
